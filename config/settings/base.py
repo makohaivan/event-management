@@ -82,6 +82,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = "accounts.User"
+
 LOGIN_URL = "login"
 
 # Map Django message levels to Bootstrap alert classes
