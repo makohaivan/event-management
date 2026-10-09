@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Register | UniEvents{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-1"><i class="fa-solid fa-user-plus"></i> Create a student account</h1>
+        <p class="text-muted">Organizer accounts are created by an administrator.</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "partials/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          Already registered? <a href="{% url 'accounts:login' %}">Log in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

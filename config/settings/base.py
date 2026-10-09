@@ -84,7 +84,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
-LOGIN_URL = "login"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "dashboard:redirect"
+LOGOUT_REDIRECT_URL = "home"
 
 # Map Django message levels to Bootstrap alert classes
 from django.contrib.messages import constants as message_constants  # noqa: E402

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Access denied | UniEvents{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-3">403</h1>
+  <p class="lead">You do not have permission to perform this action.</p>
+  <a href="{% url 'home' %}" class="btn btn-primary">Back to home</a>
+</div>
+{% endblock %}
