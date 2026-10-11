@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}My events | UniEvents{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">My events</h1>
+  <a href="{% url 'events:create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create event</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-6">
+    <input type="search" name="q" value="{{ search }}" class="form-control" placeholder="Search by title or venue">
+  </div>
+  <div class="col-md-4">
+    <select name="status" class="form-select" aria-label="Filter by status">
+      <option value="">All statuses</option>
+      {% for value, label in statuses %}
+        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid"><button class="btn btn-outline-primary" type="submit">Filter</button></div>
+</form>
+
+{% if page_obj %}
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Event</th><th>Date</th><th>Registered</th><th>Status</th><th class="text-end">Actions</th></tr>
+      </thead>
+      <tbody>
+      {% for event in page_obj %}
+        <tr>
+          <td>
+            <a href="{% url 'events:manage_detail' event.pk %}" class="fw-semibold text-decoration-none">{{ event.title }}</a>
+            <div class="small text-muted">{{ event.category }} &middot; {{ event.venue }}</div>
+          </td>
+          <td>{{ event.event_date|date:"d M Y" }}<div class="small text-muted">{{ event.start_time|time:"H:i" }}</div></td>
+          <td>{{ event.registered_total }} / {{ event.maximum_capacity }}</td>
+          <td>{% include "partials/status_badge.html" with event=event %}</td>
+          <td class="text-end">
+            <a href="{% url 'events:manage_detail' event.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
+            {% if event.organizer_can_edit %}
+              <a href="{% url 'events:edit' event.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include "partials/pagination.html" %}
+{% else %}
+<div class="alert alert-info">
+  No events found. <a href="{% url 'events:create' %}">Create your first event</a>.
+</div>
+{% endif %}
+{% endblock %}

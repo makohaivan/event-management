@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Reject event | UniEvents{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4">Reject "{{ event.title }}"</h1>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "partials/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-danger">Reject event</button>
+          <a href="{% url 'events:approvals' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} | UniEvents{% endblock %}
+{% block content %}
+<div class="mb-3"><a href="{% url 'events:my_events' %}" class="text-decoration-none">&larr; Back to my events</a></div>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">{{ event.title }}</h1>
+    {% include "partials/status_badge.html" with event=event %}
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    {% if event.organizer_can_edit %}
+      <a href="{% url 'events:edit' event.pk %}" class="btn btn-outline-primary">Edit</a>
+    {% endif %}
+    {% if event.can_submit_for_approval %}
+      <form method="post" action="{% url 'events:submit' event.pk %}">
+        {% csrf_token %}<button class="btn btn-primary" type="submit">Submit for approval</button>
+      </form>
+    {% endif %}
+    {% if event.can_complete %}
+      <form method="post" action="{% url 'events:complete' event.pk %}">
+        {% csrf_token %}<button class="btn btn-success" type="submit">Mark completed</button>
+      </form>
+    {% endif %}
+    {% if event.can_cancel %}
+      <a href="{% url 'events:cancel' event.pk %}" class="btn btn-outline-danger">Cancel event</a>
+    {% endif %}
+    {% if event.organizer_can_delete %}
+      <a href="{% url 'events:delete' event.pk %}" class="btn btn-outline-danger">Delete</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if event.status == 'rejected' and event.rejection_reason %}
+  <div class="alert alert-danger">
+    <strong>Rejected:</strong> {{ event.rejection_reason }}<br>
+    <span class="small">Fix the issues, then submit the event for approval again.</span>
+  </div>
+{% elif event.status == 'pending' %}
+  <div class="alert alert-warning">This event is waiting for an administrator to review it.</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      {% if event.event_image %}
+        <img src="{{ event.event_image.url }}" class="card-img-top" alt="{{ event.title }}" style="max-height: 320px; object-fit: cover;">
+      {% endif %}
+      <div class="card-body">
+        <h2 class="h5">About this event</h2>
+        <p class="mb-0" style="white-space: pre-line;">{{ event.description }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Category:</strong> {{ event.category }}</li>
+        <li class="list-group-item"><strong>Venue:</strong> {{ event.venue }}</li>
+        <li class="list-group-item"><strong>Date:</strong> {{ event.event_date|date:"D, d M Y" }}</li>
+        <li class="list-group-item"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</li>
+        <li class="list-group-item"><strong>Register by:</strong> {{ event.registration_deadline|date:"d M Y, H:i" }}</li>
+        <li class="list-group-item"><strong>Capacity:</strong> {{ event.maximum_capacity }}</li>
+        <li class="list-group-item"><strong>Registered:</strong> {{ event.registered_count }}</li>
+        <li class="list-group-item"><strong>Available:</strong> {{ event.available_seats }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

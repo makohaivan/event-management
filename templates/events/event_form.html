@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} | UniEvents{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-4">{{ page_title }}</h1>
+        <form method="post" enctype="multipart/form-data" id="event-form">
+          {% csrf_token %}
+          {% for error in form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endfor %}
+          {% include "partials/form_field.html" with field=form.title %}
+          {% include "partials/form_field.html" with field=form.description %}
+          <div class="row">
+            <div class="col-md-6">{% include "partials/form_field.html" with field=form.category %}</div>
+            <div class="col-md-6">{% include "partials/form_field.html" with field=form.venue %}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">{% include "partials/form_field.html" with field=form.event_date %}</div>
+            <div class="col-md-4">{% include "partials/form_field.html" with field=form.start_time %}</div>
+            <div class="col-md-4">{% include "partials/form_field.html" with field=form.end_time %}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">{% include "partials/form_field.html" with field=form.registration_deadline %}</div>
+            <div class="col-md-6">{% include "partials/form_field.html" with field=form.maximum_capacity %}</div>
+          </div>
+          {% include "partials/form_field.html" with field=form.event_image %}
+          {% if form.organizer %}
+            {% include "partials/form_field.html" with field=form.organizer %}
+            {% include "partials/form_field.html" with field=form.is_featured %}
+          {% endif %}
+          <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+          <a href="{% url cancel_url %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Front-end validation (the server checks everything again).
+  (function () {
+    const date = document.getElementById("id_event_date");
+    const start = document.getElementById("id_start_time");
+    const end = document.getElementById("id_end_time");
+    const deadline = document.getElementById("id_registration_deadline");
+    function validate() {
+      end.setCustomValidity(
+        start.value && end.value && end.value <= start.value
+          ? "End time must be after the start time." : "");
+      let message = "";
+      if (date.value && start.value && deadline.value) {
+        const eventStart = new Date(date.value + "T" + start.value);
+        if (new Date(deadline.value) >= eventStart) {
+          message = "Registration deadline must be before the event starts.";
+        }
+      }
+      deadline.setCustomValidity(message);
+    }
+    [date, start, end, deadline].forEach(function (el) {
+      el.addEventListener("input", validate);
+    });
+    validate();
+  })();
+</script>
+{% endblock %}

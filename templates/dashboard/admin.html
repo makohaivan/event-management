@@ -2,7 +2,10 @@
 {% block title %}Administrator dashboard | UniEvents{% endblock %}
 {% block content %}
 <h1 class="h3">Administrator dashboard</h1>
-<div class="alert alert-info">
-  Welcome, {{ user.display_name }}. System statistics and approvals will appear here in a later phase.
+<p class="text-muted">Welcome, {{ user.display_name }}. System statistics and charts arrive in a later phase.</p>
+<div class="d-flex flex-wrap gap-2">
+  <a href="{% url 'events:approvals' %}" class="btn btn-primary">Event approvals</a>
+  <a href="{% url 'events:admin_list' %}" class="btn btn-outline-primary">All events</a>
+  <a href="{% url 'events:category_list' %}" class="btn btn-outline-primary">Categories</a>
 </div>
 {% endblock %}

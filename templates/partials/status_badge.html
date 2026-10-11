@@ -1,0 +1,7 @@
+{% if event.status == 'draft' %}<span class="badge bg-secondary">{{ event.get_status_display }}</span>
+{% elif event.status == 'pending' %}<span class="badge bg-warning text-dark">{{ event.get_status_display }}</span>
+{% elif event.status == 'approved' %}<span class="badge bg-success">{{ event.get_status_display }}</span>
+{% elif event.status == 'rejected' %}<span class="badge bg-danger">{{ event.get_status_display }}</span>
+{% elif event.status == 'cancelled' %}<span class="badge bg-dark">{{ event.get_status_display }}</span>
+{% elif event.status == 'completed' %}<span class="badge bg-info text-dark">{{ event.get_status_display }}</span>
+{% else %}<span class="badge bg-light text-dark">{{ event.get_status_display }}</span>{% endif %}

@@ -15,6 +15,15 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'dashboard:redirect' %}">Dashboard</a>
           </li>
+          {% if user.is_organizer %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:my_events' %}">My Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:create' %}">Create Event</a></li>
+          {% endif %}
+          {% if user.is_administrator %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:admin_list' %}">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:approvals' %}">Approvals</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:category_list' %}">Categories</a></li>
+          {% endif %}
         {% endif %}
       </ul>
       <ul class="navbar-nav ms-auto align-items-lg-center">

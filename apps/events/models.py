@@ -117,3 +117,54 @@ class Event(models.Model):
     @property
     def registration_open(self):
         return self.registration_block_reason() is None
+
+    # ---- workflow rules (added in Phase 5) ----
+    @property
+    def organizer_can_edit(self):
+        return self.status in (self.Status.DRAFT, self.Status.REJECTED, self.Status.APPROVED)
+
+    @property
+    def organizer_can_delete(self):
+        return self.status in (self.Status.DRAFT, self.Status.REJECTED)
+
+    @property
+    def can_submit_for_approval(self):
+        return self.status in (self.Status.DRAFT, self.Status.REJECTED)
+
+    @property
+    def can_be_reviewed(self):
+        """Pending events are waiting for an administrator to approve or reject."""
+        return self.status == self.Status.PENDING
+
+    @property
+    def can_cancel(self):
+        return self.status == self.Status.APPROVED
+
+    @property
+    def can_complete(self):
+        return self.status == self.Status.APPROVED and timezone.now() >= self.start_datetime
+
+    def _change_status(self, allowed, new_status, **extra_fields):
+        if not allowed:
+            raise ValueError(
+                f"An event that is {self.get_status_display().lower()} cannot move to {new_status}."
+            )
+        self.status = new_status
+        for name, value in extra_fields.items():
+            setattr(self, name, value)
+        self.save(update_fields=["status", "updated_at", *extra_fields])
+
+    def submit_for_approval(self):
+        self._change_status(self.can_submit_for_approval, self.Status.PENDING, rejection_reason="")
+
+    def approve(self):
+        self._change_status(self.can_be_reviewed, self.Status.APPROVED, rejection_reason="")
+
+    def reject(self, reason):
+        self._change_status(self.can_be_reviewed, self.Status.REJECTED, rejection_reason=reason)
+
+    def cancel(self):
+        self._change_status(self.can_cancel, self.Status.CANCELLED)
+
+    def mark_completed(self):
+        self._change_status(self.can_complete, self.Status.COMPLETED)

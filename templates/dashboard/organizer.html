@@ -2,7 +2,9 @@
 {% block title %}Organizer dashboard | UniEvents{% endblock %}
 {% block content %}
 <h1 class="h3">Organizer dashboard</h1>
-<div class="alert alert-info">
-  Welcome, {{ user.display_name }}. Your events, participants and statistics will appear here in a later phase.
+<p class="text-muted">Welcome, {{ user.display_name }}. Statistics and charts arrive in a later phase.</p>
+<div class="d-flex gap-2">
+  <a href="{% url 'events:my_events' %}" class="btn btn-primary">My events</a>
+  <a href="{% url 'events:create' %}" class="btn btn-outline-primary">Create event</a>
 </div>
 {% endblock %}
