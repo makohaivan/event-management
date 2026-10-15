@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} | UniEvents{% endblock %}
+{% block content %}
+<div class="mb-3"><a href="{% url 'events:list' %}" class="text-decoration-none">&larr; All events</a></div>
+
+{% if previewing %}
+  <div class="alert alert-warning">
+    <strong>Preview:</strong> this event is <strong>{{ event.get_status_display|lower }}</strong>,
+    so students cannot see it yet.
+  </div>
+{% endif %}
+{% if event.status == 'cancelled' %}
+  <div class="alert alert-danger"><strong>This event has been cancelled.</strong></div>
+{% elif event.status == 'completed' %}
+  <div class="alert alert-secondary">This event has ended.</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      {% if event.event_image %}
+        <img src="{{ event.event_image.url }}" class="card-img-top" alt="{{ event.title }}"
+             style="max-height: 340px; object-fit: cover;">
+      {% endif %}
+      <div class="card-body">
+        <span class="badge bg-primary-subtle text-primary-emphasis mb-2">{{ event.category.name }}</span>
+        {% if event.is_featured %}<span class="badge bg-warning text-dark mb-2"><i class="fa-solid fa-star"></i> Featured</span>{% endif %}
+        <h1 class="h3">{{ event.title }}</h1>
+        <p class="text-muted">Organized by {{ event.organizer.display_name }}</p>
+        <hr>
+        <h2 class="h5">About this event</h2>
+        <p class="mb-0" style="white-space: pre-line;">{{ event.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><i class="fa-regular fa-calendar"></i> <strong>Date:</strong> {{ event.event_date|date:"D, d M Y" }}</li>
+        <li class="list-group-item"><i class="fa-regular fa-clock"></i> <strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</li>
+        <li class="list-group-item"><i class="fa-solid fa-location-dot"></i> <strong>Venue:</strong> {{ event.venue }}</li>
+        <li class="list-group-item"><i class="fa-solid fa-hourglass-half"></i> <strong>Register by:</strong> {{ event.registration_deadline|date:"d M Y, H:i" }}</li>
+      </ul>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-uppercase text-muted">Availability</h2>
+        <div class="progress mb-2" role="progressbar" aria-label="Seats taken"
+             aria-valuenow="{{ percent_full }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar {% if percent_full >= 90 %}bg-danger{% elif percent_full >= 70 %}bg-warning{% else %}bg-success{% endif %}"
+               style="width: {{ percent_full }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between small mb-3">
+          <span>Capacity: <strong>{{ event.maximum_capacity }}</strong></span>
+          <span>Registered: <strong>{{ event.registered_total }}</strong></span>
+          <span>Available: <strong>{{ event.seats_left }}</strong></span>
+        </div>
+
+        {% if registration_state == 'open' %}
+          <div class="alert alert-success small">Registration is open until {{ event.registration_deadline|date:"d M Y, H:i" }}.</div>
+          {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary w-100">Log in to register</a>
+          {% endif %}
+          {# Phase 7 adds the Register button for students here #}
+        {% elif registration_state == 'full' %}
+          <div class="alert alert-danger fw-semibold mb-0">Registration Full</div>
+        {% elif registration_state == 'closed' %}
+          <div class="alert alert-secondary mb-0">Registration deadline has passed.</div>
+        {% else %}
+          <div class="alert alert-secondary mb-0">Registration is not available for this event.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if related_events %}
+<section class="mt-5">
+  <h2 class="h5 mb-3">More {{ event.category.name }} events</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for event in related_events %}<div class="col">{% include "partials/event_card.html" %}</div>{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

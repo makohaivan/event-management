@@ -2,7 +2,6 @@
 {% block title %}Student dashboard | UniEvents{% endblock %}
 {% block content %}
 <h1 class="h3">Student dashboard</h1>
-<div class="alert alert-info">
-  Welcome, {{ user.display_name }}. Your registrations and attendance will appear here in a later phase.
-</div>
+<p class="text-muted">Welcome, {{ user.display_name }}. Your registrations and attendance will appear here in a later phase.</p>
+<a href="{% url 'events:list' %}" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Browse events</a>
 {% endblock %}

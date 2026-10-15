@@ -11,6 +11,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'events:list' %}">Browse Events</a></li>
         {% if user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'dashboard:redirect' %}">Dashboard</a>
@@ -20,7 +21,7 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'events:create' %}">Create Event</a></li>
           {% endif %}
           {% if user.is_administrator %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'events:admin_list' %}">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'events:admin_list' %}">Manage Events</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'events:approvals' %}">Approvals</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'events:category_list' %}">Categories</a></li>
           {% endif %}

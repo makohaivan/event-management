@@ -1,0 +1,28 @@
+<div class="card h-100 shadow-sm event-card">
+  {% if event.event_image %}
+    <img src="{{ event.event_image.url }}" class="card-img-top" alt="{{ event.title }}"
+         style="height: 160px; object-fit: cover;">
+  {% else %}
+    <div class="bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
+         style="height: 160px;" aria-hidden="true">
+      <i class="fa-solid fa-calendar-days fa-3x"></i>
+    </div>
+  {% endif %}
+  <div class="card-body d-flex flex-column">
+    <span class="badge bg-primary-subtle text-primary-emphasis align-self-start mb-2">{{ event.category.name }}</span>
+    <h3 class="h6 card-title">
+      <a href="{% url 'events:detail' event.slug %}" class="stretched-link text-decoration-none text-dark">{{ event.title }}</a>
+    </h3>
+    <div class="small text-muted mb-2">
+      <div><i class="fa-regular fa-calendar"></i> {{ event.event_date|date:"D, d M Y" }} &middot; {{ event.start_time|time:"H:i" }}</div>
+      <div><i class="fa-solid fa-location-dot"></i> {{ event.venue }}</div>
+    </div>
+    <div class="mt-auto small">
+      {% if event.seats_left <= 0 %}
+        <span class="text-danger fw-semibold">Registration Full</span>
+      {% else %}
+        <span class="text-success">{{ event.seats_left }} seat{{ event.seats_left|pluralize }} left</span>
+      {% endif %}
+    </div>
+  </div>
+</div>

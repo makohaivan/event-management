@@ -6,15 +6,23 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from .slugs import unique_slug
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True, editable=False)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "categories"
         ordering = ["name"]
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = unique_slug(Category, self.name, "category", self.pk)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -30,6 +38,7 @@ class Event(models.Model):
         COMPLETED = "completed", "Completed"
 
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, unique=True, blank=True, editable=False)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="events")
     organizer = models.ForeignKey(
@@ -57,6 +66,12 @@ class Event(models.Model):
             models.Index(fields=["status", "event_date"]),
             models.Index(fields=["title"]),
         ]
+
+    def save(self, *args, **kwargs):
+        # The slug is made once, from the first title, so shared links keep working
+        if not self.slug:
+            self.slug = unique_slug(Event, self.title, "event", self.pk)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

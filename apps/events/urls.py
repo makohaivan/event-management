@@ -1,10 +1,12 @@
 from django.urls import path
 
-from . import views
+from . import public_views, views
 
 app_name = "events"
 
 urlpatterns = [
+    # Public / student
+    path("", public_views.event_list, name="list"),
     # Organizer
     path("manage/", views.my_events, name="my_events"),
     path("manage/create/", views.event_create, name="create"),
@@ -29,4 +31,6 @@ urlpatterns = [
     path("admin/categories/create/", views.category_create, name="category_create"),
     path("admin/categories/<int:pk>/edit/", views.category_edit, name="category_edit"),
     path("admin/categories/<int:pk>/delete/", views.category_delete, name="category_delete"),
+    # Public event page. Keep this LAST: a slug could otherwise swallow "manage" or "admin".
+    path("<slug:slug>/", public_views.event_detail, name="detail"),
 ]
