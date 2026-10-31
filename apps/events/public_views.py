@@ -2,6 +2,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+from apps.registrations.models import Registration
+
 from .models import Category, Event
 from .queries import (
     PUBLIC_STATUSES,
@@ -68,8 +70,13 @@ def event_detail(request, slug):
     percent_full = min(100, round(event.registered_total * 100 / capacity)) if capacity else 0
     related_events = public_events().filter(category=event.category).exclude(pk=event.pk)[:3]
 
+    my_registration = None
+    if request.user.is_authenticated and request.user.is_student:
+        my_registration = Registration.objects.filter(student=request.user, event=event).first()
+
     return render(request, "events/event_detail.html", {
         "event": event,
+        "my_registration": my_registration,
         "previewing": previewing,
         "registration_state": registration_state,
         "percent_full": percent_full,

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}My registrations | UniEvents{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">My registrations</h1>
+  <a href="{% url 'events:list' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Browse events</a>
+</div>
+
+<ul class="nav nav-pills mb-4">
+  {% for key, label, count in tabs %}
+    <li class="nav-item">
+      <a class="nav-link {% if key == current_tab %}active{% endif %}" href="?tab={{ key }}">
+        {{ label }} <span class="badge {% if key == current_tab %}bg-light text-primary{% else %}bg-secondary{% endif %} ms-1">{{ count }}</span>
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+{% if registrations %}
+  <div class="list-group shadow-sm">
+    {% for registration in registrations %}
+      <div class="list-group-item">
+        <div class="row align-items-center g-2">
+          <div class="col-md-6">
+            <a href="{% url 'events:detail' registration.event.slug %}" class="fw-semibold text-decoration-none">{{ registration.event.title }}</a>
+            <div class="small text-muted">
+              <i class="fa-regular fa-calendar"></i> {{ registration.event.event_date|date:"D, d M Y" }} &middot; {{ registration.event.start_time|time:"H:i" }}
+              &nbsp; <i class="fa-solid fa-location-dot"></i> {{ registration.event.venue }}
+            </div>
+            <div class="small text-muted font-monospace">{{ registration.registration_number }}</div>
+          </div>
+          <div class="col-md-2">
+            {% if registration.event.status == 'cancelled' %}
+              <span class="badge bg-danger">Event cancelled</span>
+            {% else %}
+              {% with status=registration.display_status %}
+                <span class="badge {% if status == 'Registered' %}bg-primary{% elif status == 'Attended' %}bg-success{% elif status == 'Absent' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ status }}</span>
+              {% endwith %}
+            {% endif %}
+          </div>
+          <div class="col-md-4 text-md-end">
+            {% if registration.is_active %}
+              <a href="{% url 'registrations:detail' registration.registration_number %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-qrcode"></i> Ticket</a>
+              {% if registration.can_cancel %}
+                <a href="{% url 'registrations:cancel' registration.registration_number %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'events:detail' registration.event.slug %}" class="btn btn-sm btn-outline-secondary">View event</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" %}
+{% else %}
+  <div class="alert alert-info">
+    {% if current_tab == 'upcoming' %}
+      You have no upcoming registrations. <a href="{% url 'events:list' %}">Find an event to join</a>.
+    {% elif current_tab == 'past' %}
+      You have no past events yet.
+    {% elif current_tab == 'cancelled' %}
+      You have no cancelled registrations.
+    {% else %}
+      You have not registered for any event yet. <a href="{% url 'events:list' %}">Browse events</a>.
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

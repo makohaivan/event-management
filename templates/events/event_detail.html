@@ -58,12 +58,26 @@
           <span>Available: <strong>{{ event.seats_left }}</strong></span>
         </div>
 
-        {% if registration_state == 'open' %}
+        {% if my_registration and my_registration.is_active %}
+          <div class="alert alert-success mb-3"><i class="fa-solid fa-circle-check"></i> You are registered for this event.</div>
+          <a href="{% url 'registrations:detail' my_registration.registration_number %}" class="btn btn-primary w-100">
+            <i class="fa-solid fa-qrcode"></i> View ticket and manage registration
+          </a>
+        {% elif registration_state == 'open' %}
           <div class="alert alert-success small">Registration is open until {{ event.registration_deadline|date:"d M Y, H:i" }}.</div>
           {% if not user.is_authenticated %}
             <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary w-100">Log in to register</a>
           {% endif %}
-          {# Phase 7 adds the Register button for students here #}
+          {% if user.is_student %}
+            <form method="post" action="{% url 'registrations:register' event.slug %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-ticket"></i> {% if my_registration %}Register again{% else %}Register now{% endif %}
+              </button>
+            </form>
+          {% elif user.is_authenticated %}
+            <p class="small text-muted mb-0">Only student accounts can register for events.</p>
+          {% endif %}
         {% elif registration_state == 'full' %}
           <div class="alert alert-danger fw-semibold mb-0">Registration Full</div>
         {% elif registration_state == 'closed' %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Ticket {{ registration.registration_number }} | UniEvents{% endblock %}
+{% block content %}
+<div class="mb-3 no-print">
+  <a href="{% url 'registrations:my_registrations' %}" class="text-decoration-none">&larr; My registrations</a>
+</div>
+
+{% if event.status == 'cancelled' %}
+  <div class="alert alert-danger"><strong>This event has been cancelled.</strong></div>
+{% endif %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm" id="ticket">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="fa-solid fa-ticket"></i> Event ticket</span>
+        <span class="badge bg-light text-primary">{{ registration.display_status }}</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-7">
+            <h1 class="h4"><a href="{% url 'events:detail' event.slug %}" class="text-decoration-none">{{ event.title }}</a></h1>
+            <p class="text-muted mb-3">{{ event.category.name }} &middot; organized by {{ event.organizer.display_name }}</p>
+            <ul class="list-unstyled mb-3">
+              <li><i class="fa-regular fa-calendar"></i> {{ event.event_date|date:"l, d M Y" }}</li>
+              <li><i class="fa-regular fa-clock"></i> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</li>
+              <li><i class="fa-solid fa-location-dot"></i> {{ event.venue }}</li>
+            </ul>
+            <div class="small text-muted">Registration number</div>
+            <div class="fs-5 fw-semibold font-monospace">{{ registration.registration_number }}</div>
+            <div class="small text-muted mt-2">Registered {{ registration.registered_at|date:"d M Y, H:i" }}</div>
+          </div>
+          <div class="col-md-5 text-center">
+            {% if registration.is_active %}
+              <img src="{% url 'registrations:qr' registration.registration_number %}"
+                   alt="QR code for registration {{ registration.registration_number }}"
+                   class="img-fluid border rounded p-2 bg-white" style="max-width: 240px;">
+              <div class="small text-muted mt-2">Show this code at the entrance</div>
+            {% else %}
+              <div class="alert alert-secondary mb-0">
+                Cancelled on {{ registration.cancelled_at|date:"d M Y, H:i" }}.<br>
+                This QR code no longer works.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-3 no-print">
+      {% if registration.is_active %}
+        <a class="btn btn-outline-primary" href="{% url 'registrations:qr' registration.registration_number %}?download=1">
+          <i class="fa-solid fa-download"></i> Download QR
+        </a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Print ticket
+        </button>
+        {% if can_cancel %}
+          <a class="btn btn-outline-danger ms-md-auto" href="{% url 'registrations:cancel' registration.registration_number %}">Cancel registration</a>
+        {% else %}
+          <span class="text-muted small align-self-center ms-md-auto">{{ cancel_reason }}</span>
+        {% endif %}
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'events:detail' event.slug %}">View event</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

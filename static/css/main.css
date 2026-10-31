@@ -3,3 +3,8 @@
 /* phase 6: event cards */
 .event-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .event-card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
+
+/* phase 7: ticket printing */
+@media print {
+  nav.navbar, footer, .no-print, .alert-dismissible { display: none !important; }
+}

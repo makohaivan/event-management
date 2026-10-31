@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Cancel registration | UniEvents{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm border-danger">
+      <div class="card-body">
+        <h1 class="h4">Cancel your registration?</h1>
+        <p class="mb-1"><strong>{{ event.title }}</strong></p>
+        <p class="text-muted">
+          {{ event.event_date|date:"D, d M Y" }} &middot; {{ event.start_time|time:"H:i" }} &middot; {{ event.venue }}<br>
+          Registration number: <span class="font-monospace">{{ registration.registration_number }}</span>
+        </p>
+        <div class="alert alert-warning">
+          Your seat will be released and your QR code will stop working. You can register again
+          before the deadline ({{ event.registration_deadline|date:"d M Y, H:i" }}) if seats are still available.
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Yes, cancel my registration</button>
+          <a href="{% url 'registrations:detail' registration.registration_number %}" class="btn btn-outline-secondary">Keep my registration</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

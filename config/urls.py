@@ -7,6 +7,7 @@ from apps.events import public_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("events/", include("apps.events.urls")),
+    path("", include("apps.registrations.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("", public_views.home, name="home"),
